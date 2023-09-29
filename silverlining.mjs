@@ -6,8 +6,7 @@ let destination;
 let penDown = false;
 
 // 🥾 Boot
-function boot({ wipe, api }) {
-  wipe(61, 84, 112);
+function boot({ api }) {
 //   console.log(api);
 }
 
@@ -29,7 +28,7 @@ function act({ event }) {
 }
 
 // 🎨 Paint
-function paint({ ink, pen }) {
+function paint({ page, screen, system: sys }) {
 	if (origin) {
 		if (penDown) {
 			bri += direction * multiplier;
@@ -39,7 +38,9 @@ function paint({ ink, pen }) {
 			if (bri <= -1) {
 				direction = 1;
 			}
-			ink(bri).line(origin.x, origin.y, destination.x, destination.y);
+			page(sys.painting)
+			.ink(bri).line(origin.x, origin.y, destination.x, destination.y)
+			.page(screen);
 		}
 	}
 }
@@ -53,4 +54,4 @@ function meta() {
 }
 
 export { boot, paint, meta, act };
-
+export const system = "nopaint";
