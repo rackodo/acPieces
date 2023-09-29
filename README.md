@@ -6,4 +6,5 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 
 ## To Do
 - silverlining
-	- [ ] #1 
+	- [ ] clicks or taps update the origin of the pen
+	- [ ] allow this piece to save to the canvas
