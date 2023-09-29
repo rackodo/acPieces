@@ -1,25 +1,47 @@
-// silverlining, 2023.9.29.07.46.26.051
-// 
-
 let bri = 0;
 let direction = 1;
 let multiplier = 5;
+let origin;
+let destination;
+let penDown = false;
 
 // 🥾 Boot
-function boot({ wipe }) {
-  wipe(255);
+function boot({ wipe, api }) {
+  wipe(61, 84, 112);
+//   console.log(api);
+}
+
+function act({ event }) {
+	if (event.is("touch")) {
+		origin = event;
+		destination = event;
+		penDown = true;
+		console.log("Land", origin);
+	}
+	if (event.is("draw")) {
+		destination = event;
+		console.log("Drawing", destination);
+	}
+	if (event.is("lift")) {
+		penDown = false;
+		console.log("Lift", event);
+	}
 }
 
 // 🎨 Paint
-function paint({ ink, pen, screen }) {
-	bri += direction * multiplier;
-	if (bri >= 255) {
-		direction = -1;
+function paint({ ink, pen }) {
+	if (origin) {
+		if (penDown) {
+			bri += direction * multiplier;
+			if (bri >= 255) {
+				direction = -1;
+			}
+			if (bri <= -1) {
+				direction = 1;
+			}
+			ink(bri).line(origin.x, origin.y, destination.x, destination.y);
+		}
 	}
-	if (bri <= -1) {
-		direction = 1;
-	}
-	ink(bri).line([screen.center.x, screen.center.y], [pen.x, pen.y]);
 }
 
 // 📰 Meta
@@ -30,5 +52,5 @@ function meta() {
   };
 }
 
-export { boot, paint, meta };
+export { boot, paint, meta, act };
 
