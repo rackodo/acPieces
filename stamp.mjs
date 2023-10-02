@@ -115,7 +115,7 @@ function boot({ wipe, params }) {
 }
 
 // 🎨 Paint
-function paint({ ink }) {
+function paint({ ink, page, screen, system: sys }) {
 	if (contactPos) {
 
 		for (let string = 0; string < strings.length; string++) {
@@ -127,19 +127,19 @@ function paint({ ink }) {
 				case 'rect':
 					console.log("Weaving a rectangle with " + currentString[1] + " colour from " + workingStart + " to " + workingEnd)
 	
-					ink(currentString[1]).box(workingStart[0], workingStart[1], currentString[2].xB, currentString[2].yB)
+					page(sys.painting).ink(currentString[1]).box(workingStart[0], workingStart[1], currentString[2].xB, currentString[2].yB).page(screen)
 	
 					break;
 				case 'line':
 					console.log("Weaving a line with " + currentString[1] + " colour from " + workingStart + " to " + workingEnd)
 	
-					ink(currentString[1]).line(workingStart[0], workingStart[1], workingEnd[0], workingEnd[1])
+					page(sys.painting).ink(currentString[1]).line(workingStart[0], workingStart[1], workingEnd[0], workingEnd[1]).page(screen)
 	
 					break;
 				case 'oval':
 					console.log("Weaving an oval with " + currentString[1] + " colour at " + workingStart + " with radius " + workingEnd)
 	
-					ink(currentString[1]).oval(workingStart[0], workingStart[1], currentString[2].xB, currentString[2].yB, true)
+					page(sys.painting).ink(currentString[1]).oval(workingStart[0], workingStart[1], currentString[2].xB, currentString[2].yB, true).page(screen)
 	
 					break;
 				default: 
@@ -152,9 +152,9 @@ function paint({ ink }) {
 	}
 }
 
-function act({ event }) {
+function act({ event, system: sys }) {
 	if (event.is("touch")) {
-		contactPos = [event.x, event.y];
+		contactPos = [sys.nopaint.brush.x, sys.nopaint.brush.y];
 		relOriginPos = [contactPos[0] - 32, contactPos[1] - 32];
 		relEndingPos = [contactPos[0] + 32, contactPos[1] + 32];
 	}
@@ -196,6 +196,7 @@ function meta() {
 // }
 
 export { boot, paint, meta, untangle, act };
+export const system = "nopaint";
 
 // 📚 Library
 //   (Useful functions used throughout the piece)

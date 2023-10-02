@@ -14,10 +14,13 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 	[x] microcommand strings (strands) implementation
 	[x] decoding strands into stamps
 	[x] allow use of stamps in preview space
-	[ ] paint stamps onto canvas
-	[ ] develop stamp encoder
+	[x] paint stamps onto canvas
+	[-] develop stamp encoder
+		[x] website
+		[ ] builtin gui
 
-	[ ] (OPTIONAL) pull strands from pastebin
+	[?] (OPTIONAL) pull strands from pastebin
+		unsure how to implement without exposing an API key, which could be abused
 
 [x] rainbowcascade
 ```
