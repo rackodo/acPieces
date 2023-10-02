@@ -16,7 +16,7 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 	[x] allow use of stamps in preview space
 	[x] paint stamps onto canvas
 	[-] develop stamp encoder
-		[x] website
+		[x] website (see https://github.com/rackodo/strand-encoder)
 		[ ] builtin gui
 
 	[?] (OPTIONAL) pull strands from pastebin
