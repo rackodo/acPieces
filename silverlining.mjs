@@ -10,15 +10,15 @@ function boot({ api }) {
 //   console.log(api);
 }
 
-function act({ event }) {
+function act({ event, system: sys }) {
 	if (event.is("touch")) {
-		origin = event;
-		destination = event;
+		origin = sys.nopaint.brush;
+		destination = sys.nopaint.brush;
 		penDown = true;
 		console.log("Land", origin);
 	}
 	if (event.is("draw")) {
-		destination = event;
+		destination = sys.nopaint.brush;
 		console.log("Drawing", destination);
 	}
 	if (event.is("lift")) {
