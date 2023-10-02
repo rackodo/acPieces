@@ -19,7 +19,5 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 
 	[ ] (OPTIONAL) pull strands from pastebin
 
-[ ] bounce (not publishing)
-	[ ] create bouncing pixel
-	[ ] (MAYBE) create bouncing ball (with radius)
+[x] rainbowcascade
 ```
