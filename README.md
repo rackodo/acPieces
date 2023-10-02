@@ -3,6 +3,9 @@ a selection of pieces published to (or will be published to) [aesthetic.computer
 
 ## Collection
 all of these pieces can be (or will be) accessible by typing `@bash/<piece name>` into the prompt.
+- silverlining
+- stamp
+- rainbowcascade
 
 ## To Do
 ```
