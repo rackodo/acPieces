@@ -26,4 +26,6 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 		unsure how to implement without exposing an API key, which could be abused
 
 [x] rainbowcascade
+
+[x] MovementManager (not a piece)
 ```
