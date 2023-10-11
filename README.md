@@ -28,4 +28,6 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 [x] rainbowcascade
 
 [x] MovementManager (migrated to https://github.com/rackodo/aesthetic-MovementManager)
+
+[x] thoughts
 ```

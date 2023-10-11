@@ -1,11 +1,5 @@
-let deployed = false;
 let dropletIndex = 0;
 let dropletStorage = [];
-
-// const dropletPos = {
-// 	x: 0,
-// 	y: 0
-// }
 
 class Droplet {
 	constructor(x, y, hasLanded, dropletIndex) {
@@ -39,11 +33,6 @@ function boot({ api }) {
 
 function act({ event, system: sys }) {
 	if ( event.is("touch") || event.is("draw") ) {
-		// if (!deployed) {
-		// 	dropletPos.x = sys.nopaint.brush.x;
-		// 	dropletPos.y = sys.nopaint.brush.y;
-		// 	deployed = true;
-		// }
 
 		dropletStorage.push(createNewDroplet(sys.nopaint.brush.x, sys.nopaint.brush.y));
 	}
@@ -51,17 +40,6 @@ function act({ event, system: sys }) {
 
 // paint
 function paint({ screen, page, system: sys }) {
-	// if (deployed) {
-	// 	page(sys.painting).ink().box(dropletPos.x - 1, dropletPos.y - 1, 2, 2).page(screen);
-		
-	// }
-
-	// dropletStorage.forEach(function(item, index, arr) {
-	// 	page(sys.painting).ink().box(index.)
-	// })
-
-	// console.log(dropletStorage);
-
 	dropletStorage.forEach(function(item, index, arr) {
 		page(sys.painting).ink().box(item.pos.x - 1, item.pos.y -1, 2, 2).page(screen);
 	})
@@ -85,18 +63,5 @@ function meta() {
   };
 }
 
-// 🖼️ Preview
-// function preview({ ink, wipe }) {
-// Render a custom thumbnail image.
-// }
-
-// 🪷 Icon
-// function icon() {
-// Render an application icon, aka favicon.
-// }
-
 export { boot, meta, act, paint, sim };
 export const system = "nopaint";
-
-// 📚 Library
-//   (Useful functions used throughout the piece)

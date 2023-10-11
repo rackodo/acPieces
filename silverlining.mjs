@@ -7,7 +7,6 @@ let penDown = false;
 
 // 🥾 Boot
 function boot({ api }) {
-//   console.log(api);
 }
 
 function act({ event, system: sys }) {
