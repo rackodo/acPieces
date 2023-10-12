@@ -30,4 +30,8 @@ all of these pieces can be (or will be) accessible by typing `@bash/<piece name>
 [x] MovementManager (migrated to https://github.com/rackodo/aesthetic-MovementManager)
 
 [x] thoughts
+
+[ ] touchdetection
+	[x] check if mouse is inside circle
+	[ ] detection system is currently in twocirclesdemo - move to separate repo
 ```
