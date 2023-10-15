@@ -107,15 +107,15 @@ function untangle( strands ) {
 
 }
 
-let contactPos, relOriginPos, relEndingPos, strings;
+let contactPos, relOriginPos, strings;
 
 // 🥾 Boot
-function boot({ wipe, params }) {
+function boot({ params }) {
 	strings = untangle(params)
 }
 
 // 🎨 Paint
-function paint({ ink, page, screen, system: sys }) {
+function paint({ page, screen, system: sys }) {
 	if (contactPos) {
 
 		for (let string = 0; string < strings.length; string++) {
@@ -147,8 +147,6 @@ function paint({ ink, page, screen, system: sys }) {
 			}
 		}
 		return;
-
-		contactPos = undefined;
 	}
 }
 
@@ -160,23 +158,6 @@ function act({ event, system: sys }) {
 	}
 }
 
-
-
-// 🧮 Sim
-// function sim() {
-//  // Runs once per logic frame. (120fps locked.)
-// }
-
-// 🥁 Beat
-// function beat() {
-//   // Runs once per metronomic BPM.
-// }
-
-// 👋 Leave
-// function leave() {
-//  // Runs once before the piece is unloaded.
-// }
-
 // 📰 Meta
 function meta() {
   return {
@@ -185,18 +166,5 @@ function meta() {
   };
 }
 
-// 🖼️ Preview
-// function preview({ ink, wipe }) {
-// Render a custom thumbnail image.
-// }
-
-// 🪷 Icon
-// function icon() {
-// Render an application icon, aka favicon.
-// }
-
 export { boot, paint, meta, untangle, act };
 export const system = "nopaint";
-
-// 📚 Library
-//   (Useful functions used throughout the piece)

@@ -6,7 +6,7 @@ let destination;
 let penDown = false;
 
 // 🥾 Boot
-function boot({ api }) {
+function boot({  }) {
 }
 
 function act({ event, system: sys }) {
