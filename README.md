@@ -20,13 +20,21 @@ a selection of pieces published to (or will be published to) [aesthetic.computer
 		unsure how to implement without exposing an API key, which could be abused
 
 [x] rainbowcascade
+	[?] mental note for the future - try to make this more efficient and less resource heavy? it CHUGS memory atm
 
-[x] MovementManager (migrated to https://github.com/rackodo/aesthetic-MovementManager)
+[ ] movementmanager
+	[x] base implementation
+	[ ] wasd and arrow key separation
+	could allow for two players at once. maybe three if i throw in ijkl keys, but i don't know if that would be worth the time
 
 [x] thoughts
+	nothing to really say here, except i had to learn about radial coordinates to make this one work. lowkey super proud of myself
 
 [ ] touchdetection
 	[x] check if mouse is inside circle
-	[x] detection system is currently in twocirclesdemo - move to separate repo
+	[x] add circle detector
+	[x] create demo
+	twocirclesdemo is only meant to showcase the detection of hovers, clicks and drags. it doesn't need to be perfect if it shows the concept and what can be done
 	[ ] add rectangle detector
+	this will be vastly easier than the circle detector. check if the cursor is inside the bounds of a box, that's much easier than calculating angles, distances, etc.
 ```
