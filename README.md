@@ -37,4 +37,10 @@ a selection of pieces published to (or will be published to) [aesthetic.computer
 	twocirclesdemo is only meant to showcase the detection of hovers, clicks and drags. it doesn't need to be perfect if it shows the concept and what can be done
 	[ ] add rectangle detector
 	this will be vastly easier than the circle detector. check if the cursor is inside the bounds of a box, that's much easier than calculating angles, distances, etc.
+
+	A---------+ A: (0,0) | B: (5,5) | C: (2, 3)
+	|         |
+	|  C      | IF (C.x > A.x) AND (C.x < B.x) THEN C.x is inside the bounds 
+	|         | IF (C.y > A.y) AND (C.y < B.y) THEN C.y is inside the bounds
+	+---------B
 ```
