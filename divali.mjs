@@ -1,14 +1,12 @@
 export function Divali( input ) {
-	// let arr = input.split("");
-	// let output = "";
+	let arr = input.split("");
+	let output = "";
 
-	// for (let i = 0; i < arr.length - 1; i++) {
-	// 	let flip = arr.shift();
-	// 	arr.push(flip)
-	// }
+	for (let i = 0; i < arr.length - 1; i++) {
+		let flip = arr.shift();
+		arr.push(flip)
+	}
 	
-	// output = arr.join("")
-	// return output;
-
-	return typeof input;
+	output = arr.join("")
+	return output;
 }
