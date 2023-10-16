@@ -45,6 +45,55 @@ class Detector {
 				}
 			}
 		};
+		this.RectDetect = class {
+			constructor(x, y, w, h) {
+				this.origin = {
+					x: x,
+					y: y
+				}
+				this.size = {
+					x: w,
+					y: h
+				}
+				this.isTouching = false;
+				this.isHeld = false;
+			}
+
+			draw(ink) {
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x - 0.5, this.size.y - 0.5)
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x, this.size.y)
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x + 0.5, this.size.y + 0.5)
+
+				ink("red").circle(this.origin.x, this.origin.y, 2)
+				ink("red").circle(this.origin.x, this.origin.y + this.size.y, 2)
+				ink("red").circle(this.origin.x + this.size.x, this.origin.y, 2)
+				ink("red").circle(this.origin.x + this.size.x, this.origin.y + this.size.y, 2)
+			}
+
+			calculate(x, y, click) {
+			let relative = {
+				x: this.origin.x + this.size.x,
+				y: this.origin.y + this.size.y
+			}
+
+				if (
+					x >= this.origin.x && 
+					x <= relative.x && 
+					y >= this.origin.y && 
+					y <= relative.y
+				) {
+					this.isTouching = true;
+					if (click) {
+						this.isHeld = true;
+					} else {
+						this.isHeld = false;
+					}
+				}
+				else {
+					this.isTouching = false;
+				}
+			}
+		}
 		this.point = {
 			x: undefined,
 			y: undefined
@@ -69,6 +118,7 @@ let detect = new Detector();
 
 let circleA = new detect.CircleDetect(undefined, undefined, 10);
 let circleB = new detect.CircleDetect(undefined, undefined, 10);
+let rectA = new detect.RectDetect(5, 25, 50, 50);
 
 // 🥾 Boot
 function boot({ wipe, screen, num }) {
@@ -87,6 +137,8 @@ function paint({ ink, wipe }) {
 	wipe(0)
 	circleA.draw(ink)
 	circleB.draw(ink)
+
+	rectA.draw(ink)
 
 	ink(255, 255, 255, 50).line(circleA.origin, circleB.origin)
 
@@ -113,6 +165,7 @@ function sim() {
 	// Runs once per logic frame. (120fps locked.)
 	circleA.calculate(detect.point.x, detect.point.y, detect.isClicking)
 	circleB.calculate(detect.point.x, detect.point.y, detect.isClicking)
+	rectA.calculate(detect.point.x, detect.point.y, detect.isClicking)
 }
 
 // 🥁 Beat

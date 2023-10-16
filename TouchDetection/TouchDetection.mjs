@@ -45,6 +45,50 @@ class Detector {
 				}
 			}
 		};
+		this.RectDetect = class {
+			constructor(x, y, w, h) {
+				this.origin = {
+					x: x,
+					y: y
+				}
+				this.size = {
+					x: w,
+					y: h
+				}
+				this.isTouching = false;
+				this.isHeld = false;
+			}
+
+			draw(ink) {
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x - 0.5, this.size.y - 0.5)
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x, this.size.y)
+				ink(this.isTouching ? "yellow" : "white").box(this.origin.x, this.origin.y, this.size.x + 0.5, this.size.y + 0.5)
+			}
+
+			calculate(x, y, click) {
+			let relative = {
+				x: this.origin.x + this.size.x,
+				y: this.origin.y + this.size.y
+			}
+
+				if (
+					x >= this.origin.x && 
+					x <= relative.x && 
+					y >= this.origin.y && 
+					y <= relative.y
+				) {
+					this.isTouching = true;
+					if (click) {
+						this.isHeld = true;
+					} else {
+						this.isHeld = false;
+					}
+				}
+				else {
+					this.isTouching = false;
+				}
+			}
+		}
 		this.point = {
 			x: undefined,
 			y: undefined
