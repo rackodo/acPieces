@@ -1,3 +1,3 @@
-export function Divali() {
-	return ("spoinky")
+export function Divali( input ) {
+	return ("Divali: " + input)
 }
