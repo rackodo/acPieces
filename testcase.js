@@ -1,3 +1,3 @@
-import { Divali } from "./divali.mjs";
+import { mParse } from "./mParse.mjs"
 
-console.log(Divali("This is a long string to test the file working."))
+console.log(mParse("✨"))
