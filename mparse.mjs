@@ -6,5 +6,6 @@ export function mparse( input ) {
 	// message.push(input);
 	// message.push("\*Brought to you by the letter B!\*")
 	// return message.join("\n");
+	return "Howdy"
 	return input
 }
