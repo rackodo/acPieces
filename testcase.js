@@ -1,3 +1,3 @@
-import { mParse } from "./mParse.mjs"
+import { mparse } from "./mparse.mjs"
 
-console.log(mParse("✨"))
+console.log(mparse("✨"))

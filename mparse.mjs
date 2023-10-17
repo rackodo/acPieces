@@ -1,4 +1,4 @@
-export function mParse( input ) {
+export function mparse( input ) {
 	/* 
 	In honour of Markus Calveley. The gayest little bastard to ever be imagined. 
 	*/
