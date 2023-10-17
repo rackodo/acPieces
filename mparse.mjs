@@ -1,6 +1,6 @@
 export function mparse( input ) {
 	/* 
-	In honour of Markus Calveley. The gayest little bastard to ever be imagined. 
+	In honour of Markus Calveley.
 	*/
 	let message = [];
 	message.push(input);
