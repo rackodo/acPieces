@@ -1,3 +1,7 @@
+/* 
+In honour of Markus Calveley.
+*/
+
 const commandMap = {
 	'📐': 'rect', // Rectangle
 	'⭕️': 'oval', // Oval
@@ -5,28 +9,27 @@ const commandMap = {
 }
 
 const colourMap = {
-	0: [255, 0, 0],     // Red
-	1: [0, 0, 255],     // Blue
-	2: [0, 255, 0],     // Green
-	3: [255, 255, 0],   // Yellow
-	4: [128, 0, 255],   // Purple
-	5: [255, 128, 255], // Pink
-	6: [255, 255, 255], // White
-	7: [0, 0, 0]        // Black
+	'🟥': 'red',
+	'🟧': 'orange',
+	'🟨': 'yellow',
+	'🟩': 'green',
+	'🟦': 'blue',
+	'🟪': 'magenta',
+	'⬛️': 'black',
+	'⬜️': 'white'
 }
 
 export function mparse( code ) {
-	/* 
-	In honour of Markus Calveley.
-	*/
 	let message = [];
 	if (code in commandMap) {
 		message.push(commandMap[code]);
 	} else {
-		message.push("bummer :(")
+		if (code == 'help') {
+			message.push("This is a help message. Wooo?")
+		}
 	}
 	message.push("\*Brought to you by the letter B!\*")
 	message.push("------")
-	message.push("**v2**")
+	message.push("**v3**")
 	return message.join("\n");
 }
