@@ -61,6 +61,6 @@ export function mparse( code ) {
 	}
 	message.push("------")
 	message.push(`\*${comments.random()}\*`)
-	message.push("**v7**")
+	message.push("**v8**")
 	return message.join("\n");
 }
