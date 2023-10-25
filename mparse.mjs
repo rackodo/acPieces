@@ -1,7 +1,7 @@
 const commandMap = {
-	'': 'rect', // Rectangle
-	1: 'oval', // Oval
-	2: 'line' // Line
+	'📐': 'rect', // Rectangle
+	'⭕️': 'oval', // Oval
+	'📏': 'line' // Line
 }
 
 const colourMap = {
@@ -20,13 +20,13 @@ export function mparse( code ) {
 	In honour of Markus Calveley.
 	*/
 	let message = [];
-	if (code == "✨") {
-		message.push("You input ✨!");
-	} else if (code == "🌈") {
-		message.push("You input 🌈!")
+	if (code in commandMap) {
+		message.push(commandMap[code]);
 	} else {
-		message.push(`You didn't input ✨ or 🌈. Instead you input ${code}`)
+		message.push("bummer :(")
 	}
-	message.push("\*Brought to you by the letter B!\* **Iteration 1.1**")
+	message.push("\*Brought to you by the letter B!\*")
+	message.push("------")
+	message.push("**v2**")
 	return message.join("\n");
 }
