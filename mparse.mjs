@@ -10,6 +10,6 @@ export function mparse( code ) {
 	} else {
 		message.push("You didn't input ✨ or 🌈.")
 	}
-	message.push("\*Brought to you by the letter B!\*")
+	message.push("\*Brought to you by the letter B!\* **Iteration 1.0**")
 	return message.join("\n");
 }
