@@ -46,6 +46,6 @@ export function mparse( code ) {
 	}
 	message.push("------")
 	message.push(`\*${comments.random()}\*`)
-	message.push("**v5**")
+	message.push("**v6**")
 	return message.join("\n");
 }
