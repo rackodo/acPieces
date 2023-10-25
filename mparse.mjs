@@ -14,7 +14,7 @@ const shortCommands = {
 
 const longCommands = {
 	'📐': 'rect',
-	'⭕️': 'oval',
+	'⭕': 'oval',
 	'📏': 'line'
 }
 
@@ -38,7 +38,7 @@ let comments = [
 let helpMenu = [
 	'**Long Commands**',
 	'📐 - Rectangle. Asks for colour, width and height.',
-	'⭕️ - Oval. Asks for colour, horizontal radius and vertical radius.',
+	'⭕ - Oval. Asks for colour, horizontal radius and vertical radius.',
 	'📏 - Line. Asks for colour, starting X positon, starting Y positon, ending X position, ending Y position.',
 	' ',
 	'**Short Commands**',
@@ -48,9 +48,9 @@ let helpMenu = [
 export function mparse( code ) {
 	let message = [];
 	if (code in longCommands) {
-		message.push(longCommands[code], ", a long command.");
+		message.push(longCommands[code] + ", a long command.");
 	} else if (code in shortCommands) {
-		message.push(shortCommands[code], ", a short command.")
+		message.push(shortCommands[code] + ", a short command.")
 	}
 	else if (code == 'help') {
 		helpMenu.forEach(function(item) {
