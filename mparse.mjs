@@ -40,8 +40,8 @@ export function mparse( code ) {
 			message.push("This is a help message. Wooo?")
 		}
 	}
-	message.push(`\*${comments.random()}\*`)
 	message.push("------")
-	message.push("**v4**")
+	message.push(`\*${comments.random()}\*`)
+	message.push("**v5**")
 	return message.join("\n");
 }
