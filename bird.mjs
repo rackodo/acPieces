@@ -3,6 +3,19 @@ function randomNumBetween(min, max) {
 	return min + Math.random() * (max - min);
 }
 
+function boxCollision(objA_x, objA_y, objA_width, objA_height, objB_x, objB_y, objB_width, objB_height) {
+	if (
+		objA_x + objA_width >= objB_x &&
+		objA_x <= objB_x + objB_width &&
+		objA_y + objA_height >= objB_y &&
+		objA_y <= objB_y + objB_height
+	) {
+		return true
+	} else {
+		return false
+	}
+}
+
 // Vector code grabbed from https://www.youtube.com/watch?v=XD-7anXSOp0.
 class Vector {
 	constructor(x, y) {
@@ -32,26 +45,15 @@ class Vector {
 	}
 }
 
-function boxCollision(objA_x, objA_y, objA_width, objA_height, objB_x, objB_y, objB_width, objB_height) {
-	if (
-		objA_x + objA_width >= objB_x &&
-		objA_x <= objB_x + objB_width &&
-		objA_y + objA_height >= objB_y &&
-		objA_y <= objB_y + objB_height
-	) {
-		return true
-	} else {
-		return false
-	}
-}
-
 let hasFailed = false;
+let points = 0;
 let debug = false;
+let scoreProgressed = false;
 let gravity = new Vector(0, 0.03)
 
 class Bird {
 	constructor() {
-		this.pos = new Vector(0, 0)
+		this.pos = new Vector(60, 200)
 		this.vel = new Vector(0, 0)
 		this.isTouching = false,
 
@@ -137,6 +139,7 @@ class Pipes {
 			this.centrePos.x = 220;
 			this.centrePos.y = randomNumBetween(100, 300)
 			this.speed.x -= 0.025
+			scoreProgressed = false;
 		}
 	}
 }
@@ -145,17 +148,15 @@ let bird = new Bird();
 let pipes = new Pipes();
 
 // 🥾 Boot
-function boot({ wipe, resolution, screen, num }) {
+function boot({ wipe, resolution }) {
 	// Runs once at the start.
 	resolution(200, 400)
 	wipe(255);
-	bird.pos.x = screen.width / 2 - 40;
-	bird.pos.y = screen.height / 2;
 	pipes.centrePos.y = randomNumBetween(100, 300)
 }
 
 // 🎨 Paint
-function paint({ ink, screen, wipe, num }) {
+function paint({ ink, screen, wipe }) {
 	wipe(hasFailed ? [255, 0, 0] : 0);
 	pipes.draw(ink)
 	bird.draw(ink);
@@ -165,34 +166,60 @@ function paint({ ink, screen, wipe, num }) {
 		bird.drawBounds(ink)
 	}
 	ink(255).box(1, 1, screen.width - 2, screen.height - 2, "outline")
+	ink(debug ? ("white") : ("black")).write(points.toString(), {x: bird.pos.x + 2, y: bird.pos.y + bird.height / 2, center: "y"})
 }
 
 // 🎪 Act
-function act({ event }) {
+function act({ event, resolution }) {
 	// Respond to user input here.
 	if (event.is("keyboard:down:space") && !event.repeat || event.is("touch")) {
 		bird.vel.y = -1.2;
+	}
+
+	if (event.is("reframed")) {
+		resolution(200, 400)
 	}
 }
 
 // 🧮 Sim
 function sim() {
-	// Runs once per logic frame. (120fps locked.)
 	bird.update();
 	pipes.update()
 
-	hasFailed = (boxCollision(bird.pos.x, bird.pos.y, bird.width, bird.height, pipes.pipeTop.pos.x, pipes.pipeTop.pos.y, pipes.pipeTop.w, pipes.pipeTop.h) || (boxCollision(bird.pos.x, bird.pos.y, bird.width, bird.height, pipes.pipeBottom.pos.x, pipes.pipeBottom.pos.y, pipes.pipeBottom.w, pipes.pipeBottom.h)))
+	hasFailed = (
+		boxCollision(
+			bird.pos.x, 
+			bird.pos.y, 
+			bird.width, 
+			bird.height, 
+			pipes.pipeTop.pos.x, 
+			pipes.pipeTop.pos.y, 
+			pipes.pipeTop.w, 
+			pipes.pipeTop.h
+		) || 
+		boxCollision(
+			bird.pos.x, 
+			bird.pos.y, 
+			bird.width, 
+			bird.height, 
+			pipes.pipeBottom.pos.x, 
+			pipes.pipeBottom.pos.y, 
+			pipes.pipeBottom.w, 
+			pipes.pipeBottom.h
+		) ||
+		bird.pos.y <= 0 ||
+		bird.pos.y >= 380
+	)
+
+	if (hasFailed) {
+		fail()
+	}
+
+	if (pipes.centrePos.x <= 60 && scoreProgressed == false) {
+		scoreProgressed = true;
+		points += 1;
+	}
 }
-
-// 🥁 Beat
-// function beat() {
-//   // Runs once per metronomic BPM.
-// }
-
-// 👋 Leave
-// function leave() {
-//  // Runs once before the piece is unloaded.
-// }
 
 // 📰 Meta
 function meta() {
@@ -202,17 +229,10 @@ function meta() {
 	};
 }
 
-// 🖼️ Preview
-// function preview({ ink, wipe }) {
-// Render a custom thumbnail image.
-// }
-
-// 🪷 Icon
-// function icon() {
-// Render an application icon, aka favicon.
-// }
+function fail() {
+	bird = new Bird();
+	pipes = new Pipes();
+	points = 0;
+}
 
 export { boot, paint, sim, act, meta };
-
-// 📚 Library
-//   (Useful functions used throughout the piece)
