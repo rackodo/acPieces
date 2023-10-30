@@ -2,8 +2,10 @@
 // Basics - Points, timer, keyboard bools
 let points = 0;
 let timer = 0;
-let keyleft = false;
-let keyright = false;
+let left = false;
+let right = false;
+
+let highScore = 0;
 
 // Bullet config
 let bulletIndex = 0;
@@ -20,7 +22,33 @@ let enemySpawnRate = 1.5;
 let boundary = 130;
 let thresholdSize = 20;
 
+let whirClock = 0;
+
+let titleScreenVisible = true;
+let titleScreenOpacity = 255;
+
+let titleScreenFadeTriggered = false;
+let titleScreenFadeTime = 0.5;
+let titleScreenFadeTimer = 0;
+
 //// Functions
+String.prototype.toRGB = function() {
+    var hash = 0;
+    if (this.length === 0) return hash;
+    for (var i = 0; i < this.length; i++) {
+        hash = this.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    var rgb = [0, 0, 0];
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 255;
+        rgb[i] = value;
+    }
+    return [rgb[0], rgb[1], rgb[2]];
+}
+
+let playerColour;
+
 // Function for getting distance between two points
 const getDistance = (x1, y1, x2, y2) => {
 	let a = x1 - x2;
@@ -88,7 +116,7 @@ class Player {
 
 	// Draw the player.
 	draw(ink) {
-		ink(0, 255, 255).
+		ink(playerColour).
 		circle(this.cartPos.x, this.cartPos.y, this.bodySize, true).
 		circle(this.barrelEnd.x, this.barrelEnd.y, 3).line(this.barrelStart.x, this.barrelStart.y, this.barrelEnd.x, this.barrelEnd.y)
 	}
@@ -104,10 +132,10 @@ class Player {
 		this.vel += this.attack * this.direction;
 
 		// Smooth transitions from 0 to max speed, and vice versa.
-		if (this.vel >= 0) {
+		if (this.vel >= -0.01) {
 			this.vel -= this.friction;
 		}
-		if (this.vel <= 0) {
+		if (this.vel <= -0.01) {
 			this.vel += this.friction;
 		}
 		
@@ -210,14 +238,25 @@ class Enemy {
 let player = new Player();
 
 // 🥾 Boot
-function boot({ wipe, resolution }) {
+function boot({ wipe, resolution, handle }) {
   // Runs once at the start.
+  if (handle()) {
+	let hndl = Array.from(handle())
+	hndl.splice(0, 1)
+	hndl = hndl.join("")
+	console.log(hndl)
+	playerColour = hndl.toRGB()
+  }
+  else {
+	playerColour = [0, 255, 255]
+  }
   resolution(300)
   wipe(0);
+  player.vel = 0;
 }
 
 // 🎨 Paint
-function paint({ ink, screen, wipe }) {
+function paint({ ink, wipe }) {
 	wipe(255, 255, 255, 0)
 
 	// Draws background.
@@ -241,34 +280,113 @@ function paint({ ink, screen, wipe }) {
 
 	// Draws the score.
 	ink("white").write(points.toString(), {x: 152, y: 152, center: "xy", size: (points < 100 ? 2 : 1.5)})
+
+
+	if (titleScreenVisible) {
+		drawTitleScreen(ink)
+	}
 }
 
 // 🎪 Act
-function act({ event }) {
+function act({ event, sound: { synth} }) {
+	const shoot = () => {
+		synth({
+		  type: "sine",
+		  tone: 300,
+		  attack: 0,
+		  decay: 1,
+		  volume: 0.5,
+		  duration: 0.2,
+		});
+	}
 	// Key controls
 	if (event.is("keyboard:down") && !event.repeat) {
 		if (event.key == "ArrowLeft" || event.key == "a") {
-			keyleft = true;
+			left = true;
 		}
 		if (event.key == "ArrowRight" || event.key == "d") {
-			keyright = true;
+			right = true;
 		}
 		if (event.key == " ") {
+			if (!titleScreenFadeTriggered) {
+				titleScreenFadeTriggered = true;
+			}
 			player.shoot()
+			shoot()
 		}
 	}
 	if (event.is("keyboard:up")) {
 		if (event.key == "ArrowLeft" || event.key == "a") {
-			keyleft = false;
+			left = false;
 		}
 		if (event.key == "ArrowRight" || event.key == "d") {
-			keyright = false;
+			right = false;
+		}
+	}
+
+	// Touch Controls
+	if (event.is("touch")) {
+		if (event.x <= 100) {
+			left = true;
+		}
+		if (event.x >= 100 && event.x <= 200) {
+			if (!titleScreenFadeTriggered) {
+				titleScreenFadeTriggered = true;
+			}
+			player.shoot()
+			shoot()
+		}
+		if (event.x >= 200) {
+			right = true;
+		}
+	}
+	if (event.is("lift")) {
+		if (event.x <= 100) {
+			left = false;
+		}
+		if (event.x >= 200) {
+			right = false;
 		}
 	}
 }
 
 // 🧮 Sim
-function sim() {
+function sim({ sound: { synth } }) {
+	let vol = 0;
+	const whir = () => {
+		synth({
+		  type: "square",
+		  tone: 10,
+		  attack: 0,
+		  decay: 0,
+		  volume: vol,
+		  duration: 0.01,
+		});
+	}
+
+	const hit = () => {
+		synth({
+		  type: "sine",
+		  tone: 600,
+		  attack: 0,
+		  decay: 1,
+		  volume: 0.75,
+		  duration: 0.2,
+		});
+	}
+
+	const crash = () => {
+		synth({
+		  type: "square",
+		  tone: 50,
+		  attack: 0,
+		  decay: 0,
+		  volume: 0.75,
+		  duration: 0.2,
+		});
+	}
+
+	vol = Math.abs(player.vel) / 4
 	// Updates player logic.
 	player.update()
 	// Updates bullets logic.
@@ -279,23 +397,31 @@ function sim() {
 
 		if (getDistance(item.cartPos.x, item.cartPos.y, 150, 150) <= thresholdSize + 5) {
 			fail()
+			crash()
 		}
 	})
 
+
+	whirClock += 1;
+	if (Math.abs(player.vel) > 0 && whirClock >= 10) {
+		whir()
+		whirClock = 0;
+	}
+
 	// Handles player directions.
-	if (keyleft && !keyright) {
+	if (left && !right || left) {
 		player.direction = -1;
-	} else if (!keyleft && keyright) {
+	} else if (!left && right || right) {
 		player.direction = 1;
-	} else if (keyleft && keyright) {
+	} else if (left && right) {
 		player.direction = 0;
-	} else if (!keyleft && !keyright) {
+	} else if (!left && !right) {
 		player.direction = 0;
 	}
 
 	// Handles enemy spawns.
 	timer += 1;
-	if (timer >= enemySpawnRate * 120) {
+	if (timer >= enemySpawnRate * 120 && titleScreenFadeTriggered) {
 		enemies.push(new Enemy(enemyIndex))
 		enemyIndex += 1;
 		timer = 0;
@@ -306,12 +432,24 @@ function sim() {
 	bullets.forEach(function(bullet) {
 		enemies.forEach(function(enemy) {
 			if (getDistance(bullet.cartPos.x, bullet.cartPos.y, enemy.cartPos.x, enemy.cartPos.y) <= 15) {
+				hit()
 				enemy.destroy()
 				bullet.destroy()
 				points += 1;
 			}
 		})
 	})
+
+	if (titleScreenVisible) {
+		if (titleScreenFadeTriggered) {
+			titleScreenFadeTimer += 1;
+			titleScreenOpacity -= (255 / (120 * titleScreenFadeTime));
+			if (titleScreenOpacity <= 0) {
+				titleScreenVisible = false;
+				console.log("Not rendering controls.")
+			}
+		}
+	}
 }
 
 // 📰 Meta
@@ -331,9 +469,40 @@ function fail() {
 	bullets = [];
 	enemies = [];
 
+	highScore = (points > highScore ? points : highScore)
+
 	points = 0;
 	enemySpawnRate = 1.5;
 	timer = 0;
+
+	titleScreenOpacity = 255;
+	titleScreenVisible = true;
+	titleScreenFadeTimer = 0;
+	titleScreenFadeTriggered = false;
+}
+
+function drawTitleScreen(ink) {
+	ink(255, 0, 0, titleScreenOpacity * 0.102).box(0, 0, 100, 300);
+	ink(0, 255, 0, titleScreenOpacity * 0.102).box(100, 0, 100, 300);
+	ink(0, 0, 255, titleScreenOpacity * 0.102).box(200, 0, 100, 300);
+
+	ink(255, 255, 0, titleScreenOpacity)
+	.write("Current high score: " + highScore.toString(), {x: 150, y: 105, center: "xy"})
+	.write("SHOOT TO START", {x: 150, y: 265, center: "xy", size: 1})
+
+	ink(255, 255, 255, titleScreenOpacity)
+	.write("FIRE!", {x: 154, y: 75, center: "xy", size: 2})
+	.write("A game by bash", {x: 150, y: 90, center: "xy"})
+	.write("LEFT ARROW", {x: 50, y: 200, center: "xy"})
+	.write("TAP LEFT", {x: 50, y: 210, center: "xy"})
+	.write("TO MOVE LEFT", {x: 50, y: 230, center: "xy"})
+	.write("SPACE", {x: 150, y: 200, center: "xy"})
+	.write("TAP MIDDLE", {x: 150, y: 210, center: "xy"})
+	.write("TO SHOOT", {x: 150, y: 230, center: "xy"})
+	.write("RIGHT ARROW", {x: 250, y: 200, center: "xy"})
+	.write("TAP RIGHT", {x: 250, y: 210, center: "xy"})
+	.write("TO MOVE RIGHT", {x: 250, y: 230, center: "xy"})
+	.write("-------------------------------------------------", {x: 150, y: 220, center: "xy"})
 }
 
 export { boot, paint, act, sim, meta };

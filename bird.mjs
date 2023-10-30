@@ -51,6 +51,23 @@ let debug = false;
 let scoreProgressed = false;
 let gravity = new Vector(0, 0.03)
 
+String.prototype.toRGB = function() {
+    var hash = 0;
+    if (this.length === 0) return hash;
+    for (var i = 0; i < this.length; i++) {
+        hash = this.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    var rgb = [0, 0, 0];
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 255;
+        rgb[i] = value;
+    }
+    return [rgb[0], rgb[1], rgb[2]];
+}
+
+let playerColour;
+
 class Bird {
 	constructor() {
 		this.pos = new Vector(60, 200)
@@ -71,7 +88,7 @@ class Bird {
 	}
 
 	draw(ink) {
-		ink(255, 255, 0).box(this.pos.x, this.pos.y, this.width, this.height, (debug ? "outline" : ""))
+		ink(playerColour).box(this.pos.x, this.pos.y, this.width, this.height, (debug ? "outline" : ""))
 		// this.y += this.fallFactor;
 	}
 
@@ -148,7 +165,18 @@ let bird = new Bird();
 let pipes = new Pipes();
 
 // 🥾 Boot
-function boot({ wipe, resolution }) {
+function boot({ wipe, resolution, handle }) {
+	if (handle()) {
+		let hndl = Array.from(handle())
+		hndl.splice(0, 1)
+		hndl = hndl.join("")
+		console.log(hndl)
+		playerColour = hndl.toRGB()
+	}
+	else {
+		playerColour = [255, 255, 0]
+	}
+
 	// Runs once at the start.
 	resolution(200, 400)
 	wipe(255);
@@ -170,9 +198,20 @@ function paint({ ink, screen, wipe }) {
 }
 
 // 🎪 Act
-function act({ event, resolution }) {
+function act({ event, resolution, sound: { play, synth }}) {
+	const flapSound = () => {
+		synth({
+		  type: "sine",
+		  tone: 300,
+		  attack: 0.1,
+		  decay: 0.99,
+		  volume: 0.75,
+		  duration: 0.1,
+		});
+	}
 	// Respond to user input here.
 	if (event.is("keyboard:down:space") && !event.repeat || event.is("touch")) {
+		flapSound()
 		bird.vel.y = -1.2;
 	}
 
@@ -182,7 +221,29 @@ function act({ event, resolution }) {
 }
 
 // 🧮 Sim
-function sim() {
+function sim({sound: { play, synth }}) {
+	const crash = () => {
+		synth({
+		  type: "square",
+		  tone: 50,
+		  attack: 0,
+		  decay: 0,
+		  volume: 0.75,
+		  duration: 0.2,
+		});
+	}
+
+	const ping = () => {
+		synth({
+		  type: "sine",
+		  tone: 600,
+		  attack: 0,
+		  decay: 0.9,
+		  volume: 0.75,
+		  duration: 0.2,
+		});
+	}
+
 	bird.update();
 	pipes.update()
 
@@ -212,11 +273,13 @@ function sim() {
 	)
 
 	if (hasFailed) {
+		crash()
 		fail()
 	}
 
 	if (pipes.centrePos.x <= 60 && scoreProgressed == false) {
 		scoreProgressed = true;
+		ping()
 		points += 1;
 	}
 }
