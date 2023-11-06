@@ -63,10 +63,10 @@ function randomNumBetween(min, max) {
 }
 
 // Function for converting polar coordinates (r, Θ) to cartesianal coordinates (x, y)
-function polarToCartesian (offset, radius, angle) {
+function polarToCartesian (offset = {x: 0, y: 0}, radius, angle) {
 	return {
-		x: offset + radius * Math.cos(angle),
-		y: offset + radius * Math.sin(angle)
+		x: offset.x + radius * Math.cos(angle),
+		y: offset.y + radius * Math.sin(angle)
 	}
 }
 
@@ -124,9 +124,9 @@ class Player {
 	// Player logic.
 	update() {
 		// Set positions based on polar coordinates.
-		this.cartPos = polarToCartesian(150, this.radius, this.angle)
-		this.barrelStart = polarToCartesian(150, this.radius + this.bodySize, this.angle)
-		this.barrelEnd = polarToCartesian(150, this.radius + this.bodySize + this.barrelSize, this.angle)
+		this.cartPos = polarToCartesian({x: 150, y: 150}, this.radius, this.angle)
+		this.barrelStart = polarToCartesian({x: 150, y: 150}, this.radius + this.bodySize, this.angle)
+		this.barrelEnd = polarToCartesian({x: 150, y: 150}, this.radius + this.bodySize + this.barrelSize, this.angle)
 
 		// Velocity update.
 		this.vel += this.attack * this.direction;
@@ -185,7 +185,7 @@ class Bullet {
 		// Make the bullet shoot out.
 		this.radius += bulletSpeed;
 		// Update cartesian coords.
-		this.cartPos = polarToCartesian(150, this.radius, this.angle);
+		this.cartPos = polarToCartesian({x: 150, y: 150}, this.radius, this.angle);
 
 		// If the bullet touches the boundary, get rid of it.
 		if (this.radius >= boundary - this.size) {
@@ -225,7 +225,7 @@ class Enemy {
 		// Make enemy approach the center.
 		this.radius -= enemySpeed;
 		// Update cartesian coords.
-		this.cartPos = polarToCartesian(150, this.radius, this.angle);
+		this.cartPos = polarToCartesian({x: 150, y: 150}, this.radius, this.angle);
 	}
 
 	// Destroy enemy.
@@ -234,8 +234,115 @@ class Enemy {
 	}
 }
 
+class ParticleSystem {
+	constructor(
+		lifetime, 
+		fadeDuration,
+		origin,
+		particleCount, 
+		range, 
+		delay, 
+		minSpeed,
+		maxSpeed,
+		scale) {
+
+		this.lifetime = lifetime;
+		this.fadeDuration = fadeDuration;
+		this.origin = origin;
+		this.particleIndex = 0;
+
+		this.particleCount = particleCount;
+		this.range = range;
+		this.delay = delay;
+
+		this.minSpeed = minSpeed;
+		this.maxSpeed = maxSpeed;
+		this.scale = scale;
+
+		this.triggered = false;
+
+		this.particles = []
+	};
+
+	trigger() {
+		this.particles = Array.from({ length: this.particleCount}, (value, index) => new Particle(
+			this.lifetime + (index * this.delay), 
+			this.fadeDuration, 
+			{x: this.origin.x + randomNumBetween(-this.range, this.range), y: this.origin.y + randomNumBetween(-this.range, this.range)},
+			index, 
+			randomNumBetween(this.minSpeed, this.maxSpeed),
+			this.scale))
+		this.triggered = true;
+	}
+
+	sim() {
+		this.particles.forEach((item) => {
+			item.update()
+			if (item.dead) {
+				return this.particles.splice(this.particles.findIndex((x) => x.index === item.index), 1)
+			}
+		})
+	}
+}
+
+class Particle {
+	constructor(
+		lifetime, 
+		fadeDuration, 
+		origin = {x: 0, y: 0}, 
+		index,
+		speed,
+		size) {
+		this.decay = 0;
+
+		this.lifetime = lifetime * 120;
+		this.fadeDuration = fadeDuration * 120;
+		
+		this.opacity = 255;
+		this.dead = false;
+		this.index = index;
+
+		this.partColour = [randomNumBetween(playerColour[0] - 50, playerColour[0] + 50), randomNumBetween(playerColour[1] - 50, playerColour[1] + 50), randomNumBetween(playerColour[2] - 50, playerColour[2] + 50)]
+		
+		this.origin = origin;
+		
+		this.scale = randomNumBetween(1, size)
+		
+		this.angle = randomNumBetween(0, 628) / 100
+		this.radius = 0;
+		this.speed = speed;
+
+		this.cartPos = {
+			x: -100,
+			y: -100
+		}
+
+	}
+	
+	async draw(ink) {
+		ink(this.partColour[0], this.partColour[1], this.partColour[2], this.opacity).circle(this.cartPos.x, this.cartPos.y, this.scale, true)
+	}
+	
+	async update() {
+		this.decay += 1;
+
+		this.radius += this.speed;
+
+		this.cartPos = polarToCartesian({x: this.origin.x, y: this.origin.y}, this.radius, this.angle);
+
+		if (this.decay >= this.lifetime) {
+			this.opacity -= (255 / this.fadeDuration)
+			if (this.opacity <= 0) {
+				this.dead = true;
+			}
+		}
+	}
+}
+
 // Init new player.
 let player = new Player();
+
+let explosion = new ParticleSystem(0.25, 0.75, {x: 150, y: 150}, 100, 10, 0.001, 0.05, 0.3, 3)
 
 // 🥾 Boot
 function boot({ wipe, resolution, handle }) {
@@ -281,6 +388,7 @@ function paint({ ink, wipe }) {
 	// Draws the score.
 	ink("white").write(points.toString(), {x: 152, y: 152, center: "xy", size: (points < 100 ? 2 : 1.5)})
 
+	explosion.particles.forEach(function(item) {item.draw(ink)})
 
 	if (titleScreenVisible) {
 		drawTitleScreen(ink)
@@ -386,6 +494,10 @@ function sim({ sound: { synth } }) {
 		});
 	}
 
+	if (explosion.triggered) {
+		explosion.sim()
+	}
+
 	vol = Math.abs(player.vel) / 4
 	// Updates player logic.
 	player.update()
@@ -446,7 +558,6 @@ function sim({ sound: { synth } }) {
 			titleScreenOpacity -= (255 / (120 * titleScreenFadeTime));
 			if (titleScreenOpacity <= 0) {
 				titleScreenVisible = false;
-				console.log("Not rendering controls.")
 			}
 		}
 	}
@@ -462,6 +573,9 @@ function meta() {
 
 // Resets the game.
 function fail() {
+	explosion.origin = player.cartPos
+	explosion.trigger()
+
 	player = new Player();
 	bulletIndex = 0;
 	enemyIndex = 0;
@@ -504,5 +618,4 @@ function drawTitleScreen(ink) {
 	.write("TO MOVE RIGHT", {x: 250, y: 230, center: "xy"})
 	.write("-------------------------------------------------", {x: 150, y: 220, center: "xy"})
 }
-
 export { boot, paint, act, sim, meta };
