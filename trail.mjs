@@ -1,4 +1,4 @@
-import Vector from 'https://aesthetic.computer/media/@bash/piece/vector.mjs'
+import Vector from 'https://assets.rackodo.dev/aesthetic-computer/vector.mjs'
 
 let points = []
 

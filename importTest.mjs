@@ -1,5 +1,5 @@
 console.log("Importing clock...")
-import clock from 'https://aesthetic.computer/media/@bash/piece/clock.mjs'
+import clock from 'https://assets.rackodo.dev/aesthetic-computer/clock.mjs'
 console.log("Imported.")
 
 let cl = new clock();
