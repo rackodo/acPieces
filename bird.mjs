@@ -1,3 +1,5 @@
+let birdSprite = "@bash/2024.8.02.15.01.30.875"
+
 // Random code grabbed from https://www.youtube.com/watch?v=XD-7anXSOp0.
 function randomNumBetween(min, max) {
 	return min + Math.random() * (max - min);
@@ -88,8 +90,8 @@ class Bird {
 	}
 
 	draw(ink) {
-		ink(playerColour).box(this.pos.x, this.pos.y, this.width, this.height, (debug ? "outline" : ""))
-		// this.y += this.fallFactor;
+		// ink(playerColour).box(this.pos.x, this.pos.y, this.width, this.height, (debug ? "outline" : ""))
+		ink().stamp(birdSprite, this.pos.x + (this.width / 2), this.pos.y + (this.height / 2));
 	}
 
 	drawBounds(ink) {
@@ -184,7 +186,7 @@ function boot({ wipe, resolution, handle }) {
 }
 
 // 🎨 Paint
-function paint({ ink, screen, wipe }) {
+function paint({ ink, screen, wipe, clear }) {
 	wipe(hasFailed ? [255, 0, 0] : 0);
 	pipes.draw(ink)
 	bird.draw(ink);
@@ -194,7 +196,7 @@ function paint({ ink, screen, wipe }) {
 		bird.drawBounds(ink)
 	}
 	ink(255).box(1, 1, screen.width - 2, screen.height - 2, "outline")
-	ink(debug ? ("white") : ("black")).write(points.toString(), {x: bird.pos.x + 2, y: bird.pos.y + bird.height / 2, center: "y"})
+	ink("white").write(points.toString(), {x: bird.pos.x + bird.height / 2, y: bird.pos.y + 25, center: "y"})
 }
 
 // 🎪 Act
