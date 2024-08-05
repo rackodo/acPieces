@@ -1,11 +1,38 @@
-import Vector from 'https://assets.rackodo.dev/aesthetic-computer/vector.mjs'
+class Vector {
+	constructor(x, y) {
+		this.x = x,
+		this.y = y
+	}
+	add(vector) {
+		this.x += vector.x;
+		this.y += vector.y;
+	}
+	mult(scalar) {
+		this.x += scalar;
+		this.y += scalar;
+	}
+	sub(vector) {
+		this.x += vector.x;
+		this.y += vector.y;
+	}
+	copy() {
+		return new Vector(this.x, this.y);
+	}
+	static random(minX, minY, maxX, maxY) {
+		return new Vector(
+			randomNumBetween(minX, maxX),
+			randomNumBetween(minY, maxY)
+		);
+	}
+}
 
 let points = []
 
-for (let i = 0; i < 100; i++) {
-	points.push(new Vector(Math.random() * 300, Math.random() * 300))
+for (let i = 0; i < 5; i++) {
+	points.push(new Vector(150 - (i * 5), 150))
 }
 
+let fruit = new Vector(Math.random() * 300, Math.random() * 300)
 
 const getDistance = (x1, y1, x2, y2) => {
 	let a = x1 - x2;
@@ -25,8 +52,10 @@ function boot({ wipe, resolution }) {
 // 🎨 Paint
 function paint({ ink, wipe }) {
 	wipe(0)
+	ink("lime").circle(fruit.x, fruit.y, 5, true)
+
 	points.forEach((point, index, arr) => {
-		ink(255, (255 / points.length) * index, 0, (255 / points.length) * index + 127).circle(point.x, point.y, (20 / points.length) * index, true)
+		ink(255, (255 / points.length) * index, 0, (255 / points.length) * index + 127).circle(point.x, point.y, 5, true)
 	});
 
 	for (let i = 0; i < points.length; i++) {
@@ -34,6 +63,7 @@ function paint({ ink, wipe }) {
 			ink(255, (127 / points.length) * i).line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
 		}
 	}
+	
 }
 
 // 🎪 Act
@@ -41,6 +71,11 @@ function act({ event }) {
  // Respond to user input here.
 	points[points.length - 1].x = event.x;
 	points[points.length - 1].y = event.y;
+	if(getDistance(event.x, event.y, fruit.x, fruit.y) <= 5) {
+		points.unshift(new Vector(points[0].x + ((Math.random() * 50) - 25), points[0].y + ((Math.random() * 50) -25)))
+		fruit.x = 25 + Math.random() * 250
+		fruit.y = 25 + Math.random() * 250
+	}
 }
 
 // 🧮 Sim
@@ -50,13 +85,21 @@ function sim() {
 		if (points[i + 1] != undefined) {
 			let distance = getDistance(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
 
-			if (distance >= 3) {
+			if (distance >= 5) {
 				let direction = Math.atan2(points[i + 1].y - points[i].y, points[i + 1].x - points[i].x)
 
 				let angle = new Vector(Math.cos(direction), Math.sin(direction))
 
 				points[i].add(angle)
 			}
+
+			console.log(points.some((point) => {
+				if (getDistance(points[i].x, points[i], point.x, point.y) < 3) {
+					return true;
+				} else {
+					return false;
+				}
+			}))
 		}
 	}
 }

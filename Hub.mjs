@@ -7,6 +7,8 @@
 let w = 256;
 let h =128;
 
+let plant = "@bash/2024.8.02.22.07.33.826"
+let carpet = "@bash/2024.8.02.22.12.58.078"
 
 function dist(x1, y1, x2, y2) {
 	var a = x1 - x2;
@@ -14,8 +16,6 @@ function dist(x1, y1, x2, y2) {
 
 	return Math.sqrt( a*a + b*b );
 }
-
-let initialEntry = false;
 
 const linePoint = (x1, y1, x2, y2, px, py) => {
 
@@ -145,7 +145,7 @@ async function boot({system: {world}}) {
 		new Door(32, 0, 96, 0, "@bash/bird"),
 		new Door(32, h - 1, 96, h - 1, "@bash/fire!"),
 		new Door(160, 0, 224, 0, "chat"),
-		new Door(160, h - 1, 224, h - 1, "field"),
+		new Door(160, h - 1, 224, h - 1, "@bash/shootemup", "yellow"),
 		new Door(0, 32, 0, 96, "prompt"),
 		new Door(w - 1, 32, w - 1, 96, "profile @bash")
 	)
@@ -162,7 +162,9 @@ function background({ wipe }) {
 // 🎨 Paint
 function paint($) {
 	
-	const { ink, api, savepan, loadpan, pan, unpan } = $;
+	const { ink, api, savepan, loadpan, pan, unpan, net, hud } = $;
+
+	hud.label("@bash's hub", "cyan")
 
 	ink("black").box(-2, -2, w + 4, h + 4)
 	ink(112, 79, 46).box(0, 0, w, h);
@@ -179,9 +181,15 @@ function paint($) {
 	ink("black").write("@bash/bird", { x: 64, y: -12, center: "x" })
 	.write("@bash/fire!", { x: 64, y: h + 4, center: "x" })
 	.write("chat", { x: 192, y: -12, center: "x" })
-	.write("field", { x: 192, y: 132, center: "x" })
+	.write("@bash/shootemup", { x: 192, y: 132, center: "x" })
 	.write("prompt", {x: -39, y: 64, center: "y"})
 	.write("profile", {x: w + 4, y: 64, center: "y"})
+
+	ink("yellow").write("*NEW* (Desktop only)", {x: 192, y: 112, center: "x"})
+
+	ink().stamp(plant, 128, -8)
+	ink().stamp(plant, 16, 112)
+	ink().stamp(carpet, 16, 64)
   
 }
 
@@ -215,8 +223,8 @@ function leave() {}
 // 📰 Meta
 function meta() {
   return {
-    title: "Field",
-    desc: "An open place to walk around.",
+    title: "@bash/hub",
+    desc: "Look at all of bash's shit and other things",
   };
 }
 
