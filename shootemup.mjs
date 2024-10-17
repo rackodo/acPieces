@@ -61,9 +61,13 @@ let banger;
 let zombieIndex = 0;
 let zombies = [];
 
-let score = 255;
+let score = 0;
 let clock = 0;
 let zombieTimer = 60;
+
+let highScore = 0;
+
+let scoreVisibility = 255;
 
 function birthZombie() {
 	let potentialSpawn;
@@ -232,7 +236,8 @@ class Zombie {
 	}
 }
 
-function boot({resolution}) {
+function boot({resolution, api}) {
+	console.log(api.notice)
 	resolution(128)
 
 	banger = new Banger(64, 64);
@@ -246,6 +251,8 @@ function paint({ wipe, ink, screen }) {
 	ink(255, 255 - (score * 1.9), 255 - (score * 1.9)).box(2, 2, screen.width - 4, screen.height - 4, "outline")
 	.write(score.toString(), {x: 64, y: 64, center: "xy"})
 
+	ink("yellow", scoreVisibility).write("High score: " + highScore, {x: 3, y: 117})
+
 	zombies.forEach((zombie) => {
 		zombie.draw(ink)
 	})
@@ -256,7 +263,7 @@ function act({ event: e }) {
 	banger.readInput(e)
 }
 
-function sim() {
+function sim({ ink }) {
 	// Runs once per logic frame. (120fps locked.)
 	zombies.forEach((zombie) => {
 		zombie.tick(banger.pos)
@@ -292,9 +299,17 @@ function sim() {
 		birthZombie()
 		clock = 0;
 	}
+
+	if (scoreVisibility >= 0) {
+		scoreVisibility -= 2.125
+	}
 }
 
 function fail() {
+	scoreVisibility = 255;
+	if (score > highScore) {
+		highScore = score
+	}
 	score = 0;
 	zombies = []
 	banger.bullets = []
