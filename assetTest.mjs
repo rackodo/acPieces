@@ -18,51 +18,24 @@ if (typeof globalThis !== 'undefined') {
 
 // module aliases
 var Engine = Matter.Engine,
-    Composite = Matter.Composite,
-    Constraint = Matter.Constraint,
     Bodies = Matter.Bodies,
-    World = Matter.World
+    World = Matter.World,
+    Constraint = Matter.Constraint,
+    Composite = Matter.Composite;
 
 // create an engine
 var engine = Engine.create();
 var world = engine.world;
 
-function createCloth(x, y, columns, rows, spacing, stiffness) {
-    var group = Matter.Body.nextGroup(true);
-    var particleOptions = { friction: 0, collisionFilter: { group: group }, render: { visible: true }, damping: 0 };
-    var constraintOptions = { stiffness: stiffness, damping: 0 };
+// create two boxes and a ground
+var boxA = Bodies.rectangle(190, 100, 20, 20, { restitution: 0.8 });
+var boxB = Bodies.rectangle(150, 150, 80, 80, { restitution: 0.8 });
+var ground = Bodies.rectangle(0, 290, 600, 10, { isStatic: true });
+var wall1 = Bodies.rectangle(0, 0, 10, 600, { isStatic: true });
+var wall2 = Bodies.rectangle(300, 0, 10, 600, { isStatic: true });
 
-    var cloth = Matter.Composites.stack(x, y, columns, rows, spacing, spacing, function(x, y) {
-        return Matter.Bodies.circle(x, y, 5, particleOptions);
-    });
-
-    Matter.Composites.mesh(cloth, columns, rows, false, constraintOptions);
-
-    // Add constraints to hold the top row of the cloth
-    for (var i = 0; i < columns; i++) {
-        var particle = cloth.bodies[i];
-        Matter.World.add(world, Matter.Constraint.create({
-            pointA: { x: particle.position.x, y: 50 },
-            bodyB: particle,
-            pointB: { x: 0, y: 0 },
-            stiffness: 1.0, // Increase stiffness to prevent sliding
-            damping: 0.1
-        }));
-    }
-
-    return cloth;
-}
-
-// Example usage
-var cloth = createCloth(200, 100, 15, 9, 20, 0);
-Matter.World.add(world, cloth);
-
-Composite.add(world, [
-    cloth,
-    Bodies.circle(300, 500, 80, { isStatic: true, render: { fillStyle: '#060a19' }}),
-    Bodies.rectangle(500, 480, 80, 80, { isStatic: true, render: { fillStyle: '#060a19' }}),
-    Bodies.rectangle(400, 609, 800, 50, { isStatic: true })
-]);
+// add all of the bodies to the world
+World.add(world, [boxA, boxB, ground, wall1, wall2]);
 
 // Variables to track mouse state
 var mouseX = 0, mouseY = 0, mouseDown = false;
@@ -120,10 +93,8 @@ function render() {
     requestAnimationFrame(render);
 }
 
-render();
-
 function boot({ resolution }) {
-    resolution(800, 600);
+    resolution(300);
 }
 
 function paint({ ink, wipe }) {
@@ -144,14 +115,12 @@ function paint({ ink, wipe }) {
 
 function act({ event }) {
 	// console.log(event)
-    if (event.is("drag")) {
+    if (event.is("draw")) {
         mouseX = event.x;
         mouseY = event.y;
     }
     if (event.is("touch")) {
         mouseDown = true;
-		mouseX = event.x;
-		mouseY = event.y;
     }
     if (event.is("lift")) {
         mouseDown = false;
